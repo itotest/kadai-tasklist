@@ -1,4 +1,6 @@
 class TasksController < ApplicationController
+  before_action :require_user_logged_in
+  before_action :corrent_user, only: [:destroy]
   before_action :set_task, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -13,14 +15,15 @@ class TasksController < ApplicationController
   end
   
   def create
-    @task = Task.new(task_params)
+    @task = current_user.tasks.build(task_params)
     
     if @task.save
       flash[:success] = 'Task が正常に作成されました'
-      redirect_to @task
+      redirect_to root_url
     else
+      @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
       flash.now[:danger] = 'Task が正常に作成されませんでした'
-      render :new
+      render 'toppepages/index'
     end
   end
   
@@ -42,7 +45,7 @@ class TasksController < ApplicationController
     @task.destroy
     
     flash[:success] = 'Task は正常に削除されました'
-    redirect_to tasks_url
+    redirect_back(fallback_location: root_path)
   end
 end
 
@@ -55,4 +58,11 @@ end
 # Strong Parameter
 def task_params
   params.require(:task).permit(:content, :status)
+end
+
+def corrent_user
+  @task = current_user.tasks.find_by(id: params[:id])
+  unless @task
+    redirect_to root_url
+  end
 end
