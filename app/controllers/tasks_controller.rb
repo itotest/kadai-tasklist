@@ -23,7 +23,7 @@ class TasksController < ApplicationController
     else
       @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
       flash.now[:danger] = 'Task が正常に作成されませんでした'
-      render 'toppepages/index'
+      render 'toppages/index'
     end
   end
   
