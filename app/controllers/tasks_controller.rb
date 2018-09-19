@@ -4,7 +4,7 @@ class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
 
   def index
-    @tasks = Task.all.page(params[:page]).per(3)
+    @tasks = current_user.tasks.page(params[:page])
   end
   
   def show
@@ -23,7 +23,7 @@ class TasksController < ApplicationController
     else
       @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
       flash.now[:danger] = 'Task が正常に作成されませんでした'
-      render 'toppages/index'
+      render 'tasks/index'
     end
   end
   
